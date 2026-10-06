@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BT Osaamiskartta</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --card:#fff; --ink:#172033; --muted:#62708a; --line:#dfe5ee;
+    --accent:#3659e3; --accent2:#f97316; --good:#15803d; --warn:#b45309; --bad:#b91c1c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  header{background:#101827;color:white;padding:22px 28px;position:sticky;top:0;z-index:10}
+  header h1{margin:0;font-size:22px}
+  header p{margin:6px 0 0;color:#cbd5e1;font-size:13px}
+  main{max-width:1180px;margin:24px auto;padding:0 18px 60px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(15,23,42,.04)}
+  h2{font-size:20px;margin:0 0 14px}
+  h3{font-size:16px;margin:18px 0 10px}
+  .small{font-size:13px;color:var(--muted);line-height:1.5}
+  label{font-weight:600;font-size:14px}
+  select,button{font:inherit}
+  select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:white;margin-top:8px}
+  button{border:0;border-radius:10px;padding:11px 16px;cursor:pointer;font-weight:700}
+  .primary{background:var(--accent);color:#fff}
+  .secondary{background:#eef2ff;color:#243b90}
+  .ghost{background:#eef1f5;color:#334155}
+  .danger{background:#fee2e2;color:#991b1b}
+  .stepper{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+  #s6{margin-left:auto;background:#dcfce7;color:#166534;font-size:14px;padding:10px 15px;border:1px solid #86efac;box-shadow:0 2px 8px rgba(22,101,52,.08)}
+  #s6.active{background:#bbf7d0;color:#14532d;border-color:#4ade80}
+  #s6:hover{background:#bbf7d0;color:#14532d}
+  @media(max-width:800px){#s6{margin-left:0}}
+  .step{padding:8px 11px;border-radius:999px;background:#e9eef6;color:#5b667a;font-size:12px;font-weight:700;cursor:pointer;user-select:none;transition:.15s ease}
+  .step.active{background:#dbe4ff;color:#203b9a}.step:hover{transform:translateY(-1px);box-shadow:0 2px 7px rgba(15,23,42,.12)}
+  .pill{display:inline-block;padding:5px 8px;border-radius:999px;background:#edf2ff;color:#3248a8;font-size:12px;font-weight:700;margin:2px 4px 2px 0}
+  .competency-table{width:100%;border-collapse:collapse;font-size:13px}
+  .competency-table th,.competency-table td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  .competency-table th{color:#526079;background:#f8fafc}
+  .question{padding:16px 0;border-bottom:1px solid var(--line)}
+  .assessment-block{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fafcff}
+  .assessment-block.missing{background:#fff1f2;border-color:#fca5a5}
+  .question.missing-question{background:#fff7f7;border-radius:12px;padding-left:12px;padding-right:12px}
+  .assessment-title{font-size:12px;font-weight:800;color:#44506a;margin-bottom:8px}
+  .scale.manager label{background:#fffaf5}
+  .discussion{border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:10px;background:#fff}
+  .discussion h3{margin:0 0 8px;font-size:15px}
+  .discussion-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .delta-big{font-weight:800;color:var(--bad)}
+  @media(max-width:800px){.discussion-grid{grid-template-columns:1fr}}
+  .qhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .qnum{font-size:12px;color:var(--muted);white-space:nowrap}
+  .scale{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+  .scale label{font-weight:500;text-align:center;border:1px solid var(--line);border-radius:10px;padding:9px 5px;cursor:pointer;background:#fff}
+  .scale input{display:block;margin:0 auto 5px}
+  .nav{display:flex;justify-content:space-between;gap:12px;margin-top:18px}
+  .progress{height:10px;background:#e8edf5;border-radius:999px;overflow:hidden;margin:10px 0 4px}
+  .progress > div{height:100%;background:var(--accent);width:0%}
+  .scorebox{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
+  .readiness-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .readiness-card{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff}
+  .readiness-card h3{margin:0 0 8px;font-size:15px}
+  .readiness-card .bigscore{font-size:38px}
+  .selection-summary{margin-top:16px;padding:14px;border-radius:12px;background:#eef2ff;border:1px solid #c7d2fe}
+  .next-level-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .next-level-card{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fbfdff}
+  .next-level-card h3{margin:0 0 8px}
+  .next-level-card ul{margin:8px 0 0;padding-left:20px}
+  #printReportSection{display:none}
+  @media(max-width:800px){.next-level-grid{grid-template-columns:1fr}}
+  @media print{
+    body{background:white!important}
+    body > header, body > main{display:none!important}
+    #printReportSection{display:block!important;margin:0!important;padding:0!important;color:#172033;font-family:Arial,sans-serif}
+    #printReportSection .print-card{border:1px solid #dfe5ee;border-radius:10px;padding:12px;margin:10px 0;break-inside:avoid}
+    #printReportSection table{width:100%;border-collapse:collapse;font-size:11px}
+    #printReportSection th,#printReportSection td{border-bottom:1px solid #dfe5ee;padding:6px;text-align:left;vertical-align:top}
+    #printReportSection h1{font-size:22px;margin:0 0 6px}
+    #printReportSection h2{font-size:16px;margin:16px 0 8px}
+    #printReportSection h3{font-size:13px;margin:10px 0 6px}
+    #printReportSection .muted{color:#64748b;font-size:11px}
+    @page{size:A4;margin:12mm}
+  }
+  .dev-select{display:flex;gap:10px;align-items:flex-start}
+  .dev-select input{margin-top:5px;transform:scale(1.15)}
+  .rank{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:4px}
+  .print-only{display:none}
+  @media(max-width:800px){.readiness-grid{grid-template-columns:1fr}}
+  @media print{header,.stepper,.nav,.footer-actions{display:none!important}.card{box-shadow:none}.print-only{display:block}}
+  .bigscore{font-size:46px;font-weight:800;line-height:1}
+  .status{font-size:16px;font-weight:800;margin-top:7px}
+  .levelbox{margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:14px;background:#f8fafc}
+  .levelname{font-size:24px;font-weight:800;margin:4px 0 6px}
+  .levelcriteria{margin-top:10px;display:grid;gap:6px}
+  .criterion{font-size:13px;color:var(--muted)}
+  .criterion.okc{color:var(--good);font-weight:700}
+  .criterion.nokc{color:var(--bad);font-weight:700}
+  .bar{height:10px;background:#edf1f5;border-radius:999px;overflow:hidden}
+  .bar > div{height:100%;background:var(--accent)}
+  .row{display:grid;grid-template-columns:1.5fr 65px 65px 65px 70px 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .devcard{border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:12px}
+  .devcard h3{margin-top:0}
+  .tagA{background:#fee2e2;color:#991b1b}.tagB{background:#fef3c7;color:#92400e}.tagC{background:#e2e8f0;color:#475569}
+  .tag{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}
+  canvas{max-width:100%;background:white;border-radius:12px}
+  a{color:#2547c9;text-decoration:none}
+  a:hover{text-decoration:underline}
+  .hidden{display:none}
+  .gate{padding:12px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;margin-top:12px}
+  .ok{background:#ecfdf5;border-color:#a7f3d0;color:#166534}
+  .footer-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  @media(max-width:800px){.grid{grid-template-columns:1fr}.scorebox{grid-template-columns:1fr}.row{grid-template-columns:1fr 55px 55px 55px 55px}.row .bar{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header>
+  <h1>BT Osaamiskartta</h1>
+  <p>Roolipohjainen osaamisen arviointi ja henkilökohtainen kehityspolku</p>
+</header>
+
+<main>
+  <div class="stepper" aria-label="Vaiheet">
+    <span class="step active" id="s1" role="button" tabindex="0" onclick="navigateStep('role')" onkeydown="stepKey(event,'role')">1. Rooli</span>
+    <span class="step" id="s2" role="button" tabindex="0" onclick="navigateStep('desc')" onkeydown="stepKey(event,'desc')">2. Roolikuvaus</span>
+    <span class="step" id="s3" role="button" tabindex="0" onclick="navigateStep('survey')" onkeydown="stepKey(event,'survey')">3. Kartoitus</span>
+    <span class="step" id="s4" role="button" tabindex="0" onclick="navigateStep('results')" onkeydown="stepKey(event,'results')">4. Tulokset</span>
+    <span class="step" id="s5" role="button" tabindex="0" onclick="navigateStep('development')" onkeydown="stepKey(event,'development')">5. Kehityspolku</span>
+    <span class="step" id="s6" role="button" tabindex="0" onclick="navigateStep('instructions')" onkeydown="stepKey(event,'instructions')">6. Ohjeet</span>
+  </div>
+
+  <section id="view-role" class="card">
+    <h2>1. Valitse rooli</h2>
+    <label for="role">Rooli</label>
+    <select id="role">
+      <option value="solution-architect">Solution Architect</option>
+      <option value="product-owner">Product Owner</option>
+      <option value="project-manager">Project Manager</option>
+      <option disabled>Business Analyst (tulossa)</option>
+      <option disabled>Service Owner (tulossa)</option>
+      <option disabled>Data Architect (tulossa)</option>
+    </select>
+    <p class="small">Valitse rooli. Product Owner, Project Manager ja Solution Architect ovat erillisiä rooleja omine vastuu- ja osaamisprofiileineen.</p>
+    <button class="primary" onclick="go('desc')">Jatka roolikuvaukseen</button>
+  </section>
+
+  <section id="view-desc" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2 id="roleTitle">Solution Architect</h2>
+        <p id="roleDescription"></p>
+        <h3>Keskeiset vastuut</h3>
+        <ul class="small" id="roleResponsibilities"></ul>
+        <div id="roleBoundaryBox" class="gate ok" style="margin-top:16px"></div>
+        <h3>Taustakehys</h3>
+        <span class="pill">BT-rooli</span><span class="pill">SFIA 9</span><span class="pill">1–5 arviointiasteikko</span>
+      </div>
+      <div class="card">
+        <h2>Osaamisprofiili</h2>
+        <p class="small">Tuloksissa tavoiteprofiilia verrataan sekä henkilön omaan arvioon että esimiehen arvioon.</p>
+        <table class="competency-table" id="profileTable"></table>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="ghost" onclick="go('role')">Takaisin</button>
+      <button class="primary" onclick="go('survey')">Aloita 30 kysymyksen kartoitus</button>
+    </div>
+  </section>
+
+  <section id="view-survey" class="hidden card">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+      <div>
+        <h2>3. Osaamiskartoitus – oma arvio ja esimiehen arvio</h2>
+        <p class="small">Arvioi käytännön valmiuttasi. Jokaisessa kysymyksessä annetaan sekä henkilön oma arvio että esimiehen arvio.</p>
+      </div>
+      <div class="small" id="answeredText">0 / 30</div>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+    <div id="questions"></div>
+    <div class="nav">
+      <button class="ghost" onclick="go('desc')">Takaisin</button>
+      <button class="primary" onclick="calculate()">Laske valmius</button>
+    </div>
+  </section>
+
+  <section id="view-results" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>4. Valmius tehtävään</h2>
+        <div id="summaryText" class="small"></div>
+
+        <div class="readiness-grid" style="margin-top:14px">
+          <div class="readiness-card">
+            <h3>Henkilön oma arvio</h3>
+            <div class="bigscore" id="selfScore">–</div>
+            <div class="status" id="selfStatus"></div>
+            <div class="levelbox">
+              <div class="small">Arvioitu taso</div>
+              <div class="levelname" id="selfArchitectLevel">–</div>
+              <div class="small" id="selfArchitectLevelText"></div>
+            </div>
+          </div>
+
+          <div class="readiness-card">
+            <h3>Esimiehen arvio</h3>
+            <div class="bigscore" id="managerScore">–</div>
+            <div class="status" id="managerStatus"></div>
+            <div class="levelbox">
+              <div class="small">Arvioitu taso</div>
+              <div class="levelname" id="managerArchitectLevel">–</div>
+              <div class="small" id="managerArchitectLevelText"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="gateBox" class="gate hidden"></div>
+        <div class="levelbox">
+          <div class="small">Luokittelun kriteerit</div>
+          <div class="levelcriteria" id="architectCriteria"></div>
+        </div>
+
+        <div class="levelbox">
+          <div class="small">Mitä pitää kehittää seuraavalle tasolle?</div>
+          <div class="next-level-grid">
+            <div class="next-level-card">
+              <h3>Henkilön oman arvion perusteella</h3>
+              <div id="selfNextLevel"></div>
+            </div>
+            <div class="next-level-card">
+              <h3>Esimiehen arvion perusteella</h3>
+              <div id="managerNextLevel"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Osaamisprofiili</h2>
+        <canvas id="radar" width="540" height="420"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <h2>Osaamiskohtaiset tulokset</h2>
+      <div class="small">Tavoitetta verrataan henkilön omaan arvioon ja esimiehen arvioon asteikolla 1–5. Yhteistä arviota käytetään valmius- ja roolitason laskennassa, mutta sitä ei näytetä hämähäkkikuvaajassa.</div>
+      <div id="resultRows" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <h2>Keskustelun aiheet</h2>
+      <p class="small">Nostot muodostetaan automaattisesti kahdesta näkökulmasta: suurimmat erot henkilön ja esimiehen arvioissa sekä suurimmat matkat tavoitetasoon.</p>
+      <div class="discussion-grid">
+        <div>
+          <h3>Suurimmat erot arvioissa</h3>
+          <div id="discussionDifferences"></div>
+        </div>
+        <div>
+          <h3>Suurimmat osaamisvajeet tavoitteeseen</h3>
+          <div id="discussionGaps"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="ghost" onclick="go('survey')">Muokkaa vastauksia</button>
+      <button class="primary" onclick="go('development')">Näytä kehityspolku</button>
+    </div>
+  </section>
+
+  <section id="view-development" class="hidden">
+    <div class="card">
+      <h2>5. Kehityskohteiden valinta</h2>
+      <p class="small">Työkalu ehdottaa noin 10 kehityskohdetta prioriteettijärjestyksessä. Henkilö ja esimies valitsevat yhdessä enintään kolme kehityskohdetta seuraavalle jaksolle.</p>
+      <div class="selection-summary"><b>Valitut kehityskohteet:</b> <span id="selectedCount">0</span>/3<div id="selectedNames" class="small" style="margin-top:6px">Ei valintoja.</div></div>
+      <div id="devAreas"></div>
+      <div class="footer-actions">
+        <button class="secondary" onclick="printReport()">Tulosta / tallenna PDF</button>
+        <button class="ghost" onclick="exportJSON()">Vie vastaukset JSON</button>
+        <button class="danger" onclick="resetAll()">Tyhjennä arviointi</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-instructions" class="hidden">
+    <div class="card">
+      <h2>6. Ohjeet</h2>
+      <p>Tämän työkalun tarkoitus on arvioida henkilön valmiutta toimia valitussa roolissa ja tunnistaa tärkeimmät osaamisen kehityskohteet.</p>
+
+      <h3>1. Valitse rooli</h3>
+      <p class="small">Valitse arvioitava rooli. Käytettävissä ovat Solution Architect, Product Owner ja Project Manager. Roolit on erotettu toisistaan vastuun ja päätöksenteon perusteella.</p>
+
+      <h3>2. Tutustu roolikuvaukseen ja osaamisprofiiliin</h3>
+      <p class="small">Roolikuvauksessa näkyvät roolin keskeiset vastuut, osaamisalueet, tavoitetasot ja painot. Osaamisalueet perustuvat BT-rooliin ja SFIA 9 -viitekehykseen.</p>
+
+      <h3>3. Tee osaamiskartoitus</h3>
+      <p class="small">Jokaiseen 30 kysymykseen annetaan kaksi arviota: henkilön oma arvio ja esimiehen arvio. Molemmat annetaan asteikolla 1–5. Arvioinnissa kannattaa perustaa vastaukset mahdollisimman konkreettisiin työnäyttöihin ja kokemukseen.</p>
+
+      <table class="competency-table">
+        <tr><th>Taso</th><th>Tulkinta</th></tr>
+        <tr><td>1</td><td>Tarvitsee merkittävää ohjausta / ei käytännön kokemusta</td></tr>
+        <tr><td>2</td><td>Pystyy toimimaan tuettuna</td></tr>
+        <tr><td>3</td><td>Pystyy toimimaan itsenäisesti tavanomaisissa tilanteissa</td></tr>
+        <tr><td>4</td><td>Pystyy toimimaan vaativissa tilanteissa ja tukemaan muita</td></tr>
+        <tr><td>5</td><td>Toimii vahvana asiantuntijana ja ohjaa muita</td></tr>
+      </table>
+
+      <h3>4. Tarkastele tuloksia</h3>
+      <p class="small">Tuloksissa näytetään erikseen henkilön oman arvion ja esimiehen arvion mukainen valmiusprosentti ja arvioitu roolitaso. Hämähäkkikuvaajassa verrataan tavoitetta, henkilön omaa arviota ja esimiehen arviota.</p>
+
+      <h3>5. Roolitason tulkinta</h3>
+      <ul class="small">
+        <li><b>Junior:</b> osaaminen ei vielä täytä itsenäisen roolin kriteerejä.</li>
+        <li><b>Roolitaso:</b> kriittiset osaamiset täyttyvät ja kokonaisvalmius on riittävä itsenäiseen rooliin.</li>
+        <li><b>Senior:</b> kaikki osaamisalueet ovat vähintään tavoitetasolla.</li>
+        <li><b>Expert:</b> Senior-tason lisäksi osaaminen ylittää tavoitetason merkittävästi useilla osaamisalueilla.</li>
+      </ul>
+
+      <h3>6. Käy keskustelu arvioiden eroista</h3>
+      <p class="small">Työkalu nostaa automaattisesti keskusteluun sekä suurimmat erot henkilön ja esimiehen arvioissa että suurimmat osaamisvajeet suhteessa tavoitetasoon. Näissä kohdissa kannattaa käydä läpi konkreettiset työnäytöt, esimerkit ja odotukset.</p>
+
+      <h3>7. Tee kehityssuunnitelma</h3>
+      <p class="small">Kehityspolku näyttää noin 10 priorisoitua kehityskohdetta. Henkilö ja esimies valitsevat niistä yhdessä enintään kolme seuraavalle kehitysjaksolle. Jokaiselle kohteelle annetaan materiaaleja, harjoituksia ja ehdotus työssä tehtävästä näytöstä.</p>
+
+      <h3>8. Seuraa kehittymistä</h3>
+      <p class="small">Arviointi kannattaa uusia esimerkiksi 6–12 kuukauden välein tai merkittävän roolimuutoksen jälkeen. Vastaukset voidaan viedä JSON-muodossa. Tulosta / tallenna PDF -toiminto muodostaa erillisen yhteenvedon arvioinnista, tuloksista, keskustelun aiheista ja yhdessä valituista kehityskohteista.</p>
+
+      <div class="gate ok">
+        <b>Hyvä käytäntö:</b> Älä käytä tulosta yksin henkilön suoritusarviona. Työkalun tarkoitus on tukea osaamisen kehittämistä, roolivalmiuden arviointia ja henkilön sekä esimiehen välistä keskustelua.
+      </div>
+    </div>
+  </section>
+
+</main>
+<div id="printReportSection" aria-hidden="true"></div>
+
+<script>
+const solutionArchitectCompetencies = [
+ {id:'arch', name:'Ratkaisuarkkitehtuurin kokonaisuuden suunnittelu', sfia:'ARCH', target:5, weight:15, cls:'A', gate:3.5,
+  material:[
+   ['SFIA 9 – Solution architecture','https://sfia-online.org/en/sfia-9/skills/solution-architecture'],
+   ['Azure Architecture Center','https://learn.microsoft.com/en-us/azure/architecture/']
+  ],
+  exercise:'Valitse yksi todellinen kehityshanke. Tee kolme ratkaisuvaihtoehtoa ja vertaile niitä kustannusten, riskien, skaalautuvuuden, tietoturvan, operoitavuuden ja riippuvuuksien näkökulmasta.'},
+ {id:'desn', name:'Järjestelmäsuunnittelu', sfia:'DESN', target:4, weight:12, cls:'A', gate:3.0,
+  material:[
+   ['SFIA 9 – Systems design','https://sfia-online.org/en/sfia-9/skills/systems-design'],
+   ['Azure Application Architecture Guide','https://learn.microsoft.com/en-us/azure/architecture/guide/']
+  ],
+  exercise:'Suunnittele sama palvelu kolmella tavalla: modulaarinen monoliitti, mikropalvelut ja managed/SaaS. Perustele valinta ja tunnista trade-offit.'},
+ {id:'reqm', name:'Vaatimusten ymmärtäminen ja arkkitehtuuriksi muuttaminen', sfia:'REQM', target:4, weight:10, cls:'A',
+  material:[
+   ['SFIA 9 – Requirements definition and management','https://sfia-online.org/en/sfia-9/skills/requirements-definition-and-management']
+  ],
+  exercise:'Ota yksi nykyinen vaatimuslista ja tunnista siitä arkkitehtuuriin vaikuttavat funktionaaliset ja ei-toiminnalliset vaatimukset. Kirjaa myös puuttuvat vaatimukset.'},
+ {id:'sint', name:'Integraatiot ja järjestelmien yhteentoimivuus', sfia:'SINT', target:4, weight:10, cls:'A',
+  material:[
+   ['SFIA 9 – Systems integration and build','https://sfia-online.org/en/sfia-9/skills/systems-integration-and-build'],
+   ['Microsoft Cloud Design Patterns','https://learn.microsoft.com/en-us/azure/architecture/patterns/']
+  ],
+  exercise:'Piirrä yhden nykyisen palvelun integraatiokartta ja kuvaa synkroniset, asynkroniset ja batch-rajapinnat sekä virheenkäsittely.'},
+ {id:'dtan', name:'Tieto- ja dataratkaisujen suunnittelu', sfia:'DTAN', target:4, weight:8, cls:'B',
+  material:[
+   ['SFIA 9 – Data modelling and design','https://sfia-online.org/en/sfia-9/skills/data-modelling-and-design']
+  ],
+  exercise:'Mallinna yhden liiketoiminta-alueen keskeiset käsitteet, master-data, omistajuudet, tietovirrat ja tärkeimmät datan laaturiskit.'},
+ {id:'scty', name:'Tietoturva, jatkuvuus ja ei-toiminnalliset vaatimukset', sfia:'SCTY', target:4, weight:12, cls:'A', gate:3.0,
+  material:[
+   ['SFIA 9 – Information security','https://sfia-online.org/en/sfia-9/skills/information-security'],
+   ['OWASP Threat Modeling Cheat Sheet','https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html'],
+   ['Azure Well-Architected Framework','https://learn.microsoft.com/en-us/azure/well-architected/']
+  ],
+  exercise:'Tee yhdestä nykyisestä järjestelmästä kevyt threat model: trust boundaryt, kriittinen data, viisi keskeistä uhkaa ja niitä pienentävät kontrollit.'},
+ {id:'rlmt', name:'Sidosryhmäyhteistyö ja arkkitehtuurin viestintä', sfia:'RLMT', target:4, weight:10, cls:'A',
+  material:[
+   ['SFIA 9 – Stakeholder relationship management','https://sfia-online.org/en/sfia-9/skills/stakeholder-relationship-management']
+  ],
+  exercise:'Valmistele yhdestä arkkitehtuuripäätöksestä kolme eri esitystä: liiketoimintajohdolle, kehittäjille ja tietoturvalle. Pidä ydinsanoma samana, mutta muuta perustelut kohderyhmän mukaan.'},
+ {id:'tech', name:'Teknologinen asiantuntijuus ja neuvonta', sfia:'TECH', target:4, weight:8, cls:'B',
+  material:[
+   ['SFIA 9 – Specialist advice','https://sfia-online.org/en/sfia-9/skills/specialist-advice'],
+   ['Azure Well-Architected Framework','https://learn.microsoft.com/en-us/azure/well-architected/']
+  ],
+  exercise:'Valitse yksi nouseva teknologia tai alusta ja tee yhden sivun arvio: liiketoimintahyöty, soveltuvuus, riskit, kustannus, osaamistarve ja exit-vaihtoehto.'},
+ {id:'feas', name:'Ratkaisuvaihtoehtojen ja trade-offien arviointi', sfia:'FEAS / ARCH', target:4, weight:8, cls:'A',
+  material:[
+   ['SFIA 9 – Feasibility assessment','https://sfia-online.org/en/sfia-9/skills/feasibility-assessment'],
+   ['AWS Well-Architected Framework','https://docs.aws.amazon.com/wellarchitected/latest/framework/']
+  ],
+  exercise:'Tee build vs buy vs SaaS -vertailu valitusta ratkaisusta. Arvioi liiketoimintahyöty, TCO, tekninen velka, toteutusaika, riskit ja elinkaarivaikutus.'},
+ {id:'metl', name:'Arkkitehtuurimenetelmät, dokumentointi ja governance', sfia:'METL / ARCH', target:4, weight:7, cls:'B',
+  material:[
+   ['C4 Model','https://c4model.com/'],
+   ['SFIA 9 – Methods and tools','https://sfia-online.org/en/sfia-9/skills/methods-and-tools']
+  ],
+  exercise:'Dokumentoi yksi ratkaisu C4-mallilla ja tee vähintään yksi ADR: Context, Options, Decision, Rationale, Consequences.'}
+];
+
+const solutionArchitectQuestions = [
+ ['arch','Pystyn muodostamaan liiketoimintatarpeesta kokonaisarkkitehtuurin, joka kattaa sovellukset, integraatiot, datan, infrastruktuurin, tietoturvan ja operoinnin.'],
+ ['arch','Pystyn vertailemaan arkkitehtuurivaihtoehtoja ja perustelemaan valinnan kustannusten, suorituskyvyn, skaalautuvuuden, riskien ja ylläpidettävyyden perusteella.'],
+ ['arch','Pystyn johtamaan monimutkaisen ratkaisun arkkitehtuuria suunnittelusta toteutukseen ja ratkaisemaan arkkitehtuuripoikkeamia.'],
+ ['desn','Pystyn pilkkomaan kokonaisratkaisun selkeiksi komponenteiksi, palveluiksi ja vastuiksi.'],
+ ['desn','Pystyn suunnittelemaan järjestelmän niin, että suorituskyky, skaalautuvuus, ylläpidettävyys, käytettävyys ja turvallisuus huomioidaan jo suunnitteluvaiheessa.'],
+ ['desn','Osaan valita tarkoituksenmukaisen arkkitehtuurityylin ja suunnittelumallin tilanteen mukaan.'],
+ ['reqm','Pystyn tunnistamaan liiketoimintavaatimuksista ne vaatimukset, joilla on merkittävä vaikutus arkkitehtuuriin.'],
+ ['reqm','Pystyn tunnistamaan ja tarkentamaan puutteellisesti määritellyt ei-toiminnalliset vaatimukset.'],
+ ['reqm','Pystyn haastamaan vaatimuksia rakentavasti silloin, kun ne johtaisivat tarpeettoman kalliiseen, riskialttiiseen tai monimutkaiseen ratkaisuun.'],
+ ['sint','Pystyn suunnittelemaan useiden järjestelmien välisen integraatiokokonaisuuden ja valitsemaan tarkoituksenmukaiset integraatiotavat.'],
+ ['sint','Ymmärrän synkronisen, asynkronisen, tapahtumapohjaisen ja batch-integraation erot sekä niiden vaikutukset kokonaisratkaisuun.'],
+ ['sint','Pystyn huomioimaan integraatioratkaisussa virhetilanteet, retryt, idempotenssin, monitoroinnin, tietoturvan ja erilaiset saatavuustasot.'],
+ ['dtan','Pystyn tunnistamaan ratkaisun keskeiset tietokokonaisuudet, niiden omistajuuden sekä järjestelmät, joissa master-data sijaitsee.'],
+ ['dtan','Pystyn arvioimaan, milloin tarvitaan esimerkiksi relaatiotietokantaa, dokumenttidataa, tapahtumadataa tai muuta tietomallia.'],
+ ['dtan','Pystyn laatimaan tai arvioimaan käsitteellisen ja loogisen tietomallin sekä tunnistamaan datan laatuun, elinkaareen ja tietosuojaan liittyvät riskit.'],
+ ['scty','Pystyn tunnistamaan arkkitehtuurin keskeiset tietoturvauhat ja suunnittelemaan niitä pienentävät kontrollit.'],
+ ['scty','Osaan suunnitella ratkaisun käyttöoikeuksien, autentikoinnin, lokituksen, salauksen ja salaisuuksien hallinnan periaatteet yhdessä tietoturva-asiantuntijoiden kanssa.'],
+ ['scty','Pystyn suunnittelemaan ratkaisun niin, että vikaantuminen, palautuminen, RTO/RPO, kapasiteetti ja jatkuvuusvaatimukset huomioidaan.'],
+ ['rlmt','Pystyn selittämään saman ratkaisun ymmärrettävästi liiketoimintajohdolle, kehittäjille, tietoturvalle ja operoinnille heidän näkökulmastaan.'],
+ ['rlmt','Pystyn fasilitoimaan tilanteen, jossa eri sidosryhmillä on ristiriitaiset vaatimukset, ja löytämään perustellun ratkaisun.'],
+ ['rlmt','Pystyn perustelemaan arkkitehtuuripäätöksen niin, että vaihtoehdot, hyödyt, kustannukset ja riskit ovat päätöksentekijöiden ymmärrettävissä.'],
+ ['tech','Ymmärrän riittävän syvällisesti nykyiset sovellus-, pilvi-, integraatio- ja infrastruktuuriteknologiat, jotta pystyn arvioimaan niiden soveltuvuutta.'],
+ ['tech','Pystyn arvioimaan uuden teknologian hyödyt ja riskit ilman, että valinta perustuu pelkkään teknologiatrendiin.'],
+ ['tech','Pystyn keskustelemaan toteutuksesta riittävän teknisellä tasolla kehittäjien ja teknisten asiantuntijoiden kanssa, vaikka en itse toteuttaisi ratkaisua.'],
+ ['feas','Pystyn muodostamaan realistisia vaihtoehtoja esimerkiksi build vs buy vs SaaS -ratkaisulle.'],
+ ['feas','Pystyn arvioimaan vaihtoehtoja yhtä aikaa liiketoimintahyödyn, kustannuksen, teknisen velan, toteutusajan, riskien ja elinkaaren näkökulmasta.'],
+ ['feas','Pystyn tekemään perustellun päätöksen tilanteessa, jossa mitään täydellistä ratkaisua ei ole ja yhden ominaisuuden parantaminen heikentää toista.'],
+ ['metl','Pystyn tuottamaan arkkitehtuurikuvaukset niin, että sekä kokonaisuus että yksityiskohdat ovat oikealle kohderyhmälle ymmärrettävissä.'],
+ ['metl','Dokumentoin olennaiset arkkitehtuuripäätökset, niiden perustelut, vaihtoehdot ja seuraukset niin, että päätökset voidaan myöhemmin ymmärtää.'],
+ ['metl','Pystyn ohjaamaan toteutusta arkkitehtuurin mukaisesti ilman, että governance muodostuu kehittämisen tarpeettomaksi pullonkaulaksi.']
+];
+
+
+const productOwnerCompetencies = [
+ {id:'prod', name:'Tuotevision, elinkaaren ja arvon johtaminen', sfia:'PROD', target:5, weight:15, cls:'A', gate:3.5,
+  material:[
+   ['SFIA 9 – Product management','https://sfia-online.org/en/sfia-9/skills/product-management'],
+   ['Scrum Guide','https://scrumguides.org/']
+  ],
+  exercise:'Laadi yhdelle tuotteelle yhden sivun tuotevisio: asiakas-/käyttäjäongelma, tavoiteltu arvo, kohderyhmä, keskeiset tulosmittarit ja tärkeimmät rajaukset.'},
+ {id:'prio', name:'Priorisointi, roadmap ja backlog-omistajuus', sfia:'PROD / DEMM', target:5, weight:14, cls:'A', gate:3.5,
+  material:[
+   ['SFIA 9 – Product management','https://sfia-online.org/en/sfia-9/skills/product-management'],
+   ['SFIA 9 – Demand management','https://sfia-online.org/en/sfia-9/skills/demand-management']
+  ],
+  exercise:'Priorisoi todellinen backlog vähintään kahdella menetelmällä. Dokumentoi, miksi viisi tärkeintä asiaa ovat nyt tärkeämpiä kuin seuraavat viisi.'},
+ {id:'reqm', name:'Tarpeiden muuttaminen toteutuskelpoisiksi tavoitteiksi ja vaatimuksiksi', sfia:'REQM', target:4, weight:10, cls:'A',
+  material:[['SFIA 9 – Requirements definition and management','https://sfia-online.org/en/sfia-9/skills/requirements-definition-and-management']],
+  exercise:'Valitse yksi epämääräinen liiketoimintatarve ja vie se hyväksymiskriteereihin asti yhdessä Business Analystin ja kehitystiimin kanssa.'},
+ {id:'rlmt', name:'Sidosryhmien johtaminen ja päätöksenteko', sfia:'RLMT', target:4, weight:10, cls:'A',
+  material:[['SFIA 9 – Stakeholder relationship management','https://sfia-online.org/en/sfia-9/skills/stakeholder-relationship-management']],
+  exercise:'Tee sidosryhmäkartta tuotteelle ja fasilitoi päätös tilanteessa, jossa kahdella merkittävällä sidosryhmällä on ristiriitaiset prioriteetit.'},
+ {id:'cexp', name:'Asiakas- ja käyttäjäarvon ymmärtäminen', sfia:'CEXP', target:4, weight:10, cls:'A',
+  material:[['SFIA 9 – Customer experience','https://sfia-online.org/en/sfia-9/skills/customer-experience']],
+  exercise:'Haastattele vähintään kolmea käyttäjää tai analysoi olemassa oleva käyttäjätutkimus. Muuta löydökset konkreettisiksi tuotehypoteeseiksi.'},
+ {id:'meas', name:'Tulosten, käytön ja vaikuttavuuden mittaaminen', sfia:'MEAS', target:4, weight:10, cls:'A',
+  material:[['SFIA 9 – Measurement','https://sfia-online.org/en/sfia-9/skills/measurement']],
+  exercise:'Määritä tuotteelle 3–5 outcome-mittaria. Kuvaa samalla, mitä toimintapäätöstä kukin mittari auttaa tekemään.'},
+ {id:'feas', name:'Vaihtoehtojen ja toteutettavuuden arviointi', sfia:'FEAS', target:4, weight:8, cls:'B',
+  material:[['SFIA 9 – Feasibility assessment','https://sfia-online.org/en/sfia-9/skills/feasibility-assessment']],
+  exercise:'Tee yhdestä kehitysideasta vaihtoehtovertailu: ei tehdä, kevyt muutos, laajempi kehitys, valmisratkaisu. Arvioi hyöty, kustannus, riski ja aika.'},
+ {id:'demg', name:'Toimituksen ohjaaminen yhdessä kehitystiimin kanssa', sfia:'DEMG', target:4, weight:8, cls:'B',
+  material:[['SFIA 9 – Delivery management','https://sfia-online.org/en/sfia-9/skills/delivery-management']],
+  exercise:'Johda yhden sprintti-/toimitusjakson tavoitteen määrittely, priorisointi ja lopputuloksen arviointi ilman että ohjaat tiimin teknistä toteutustapaa.'},
+ {id:'benm', name:'Liiketoimintahyödyn ja hyötyjen realisoitumisen johtaminen', sfia:'BENM', target:4, weight:8, cls:'B',
+  material:[['SFIA 9 – Benefits management','https://sfia-online.org/en/sfia-9/skills/benefits-management']],
+  exercise:'Valitse yksi roadmapin kehityskohde ja tee siitä hyötyhypoteesi: mikä muuttuu, kenelle, kuinka paljon ja millä mittarilla hyöty todennetaan.'},
+ {id:'fian', name:'Taloudellinen ja kaupallinen ymmärrys', sfia:'FIAN', target:4, weight:7, cls:'B',
+  material:[['SFIA 9 – Financial analysis','https://sfia-online.org/en/sfia-9/skills/financial-analysis']],
+  exercise:'Tee yhdestä tuotevalinnasta kevyt business case: kustannus, jatkuva kustannus, odotettu hyöty, riskit ja herkkyys tärkeimmille oletuksille.'}
+];
+
+const productOwnerQuestions = [
+ ['prod','Pystyn määrittelemään tuotteelle selkeän vision ja yhdistämään sen organisaation tavoitteisiin sekä käyttäjäarvoon.'],
+ ['prod','Pystyn johtamaan tuotetta koko elinkaaren ajan ideasta käyttöönottoon, jatkuvaan kehittämiseen ja tarvittaessa alasajoon.'],
+ ['prod','Pystyn tekemään päätöksiä siitä, mitä tuotteeseen kuuluu ja mitä siihen ei kuulu, vaikka kaikki sidosryhmät eivät olisi samaa mieltä.'],
+
+ ['prio','Pystyn priorisoimaan backlogia liiketoiminta-arvon, käyttäjäarvon, riskien, riippuvuuksien ja toteutuskustannusten perusteella.'],
+ ['prio','Pystyn muodostamaan roadmapin, joka kertoo tavoitteet ja suunnan ilman että se muuttuu yksityiskohtaiseksi projektisuunnitelmaksi.'],
+ ['prio','Pystyn sanomaan perustellusti ei tai ei vielä myös tärkeiksi koetuille kehitystoiveille.'],
+
+ ['reqm','Pystyn muuttamaan liiketoiminta- ja käyttäjätarpeen selkeäksi tavoitteeksi ja riittävän tarkaksi toteutuksen lähtökohdaksi.'],
+ ['reqm','Pystyn määrittelemään hyväksymiskriteerit niin, että tiimi ja sidosryhmät ymmärtävät, milloin tavoiteltu lopputulos on saavutettu.'],
+ ['reqm','Osaan erottaa, mikä vaatimus kuuluu Product Ownerin päätettäväksi ja missä Business Analystin syvällisempi analyysi tuo lisäarvoa.'],
+
+ ['rlmt','Pystyn johtamaan sidosryhmäkeskustelua tilanteessa, jossa tavoitteet tai prioriteetit ovat keskenään ristiriidassa.'],
+ ['rlmt','Pystyn perustelemaan tuote- ja priorisointipäätökset johdolle, käyttäjille ja kehitystiimille heidän näkökulmastaan.'],
+ ['rlmt','Pystyn rakentamaan riittävän päätöksentekomallin niin, ettei backlog muutu kaikkien toiveiden kompromissilistaksi.'],
+
+ ['cexp','Pystyn tunnistamaan tuotteen tärkeimmät käyttäjäryhmät, heidän ongelmansa ja tavoitellun asiakas-/käyttäjäarvon.'],
+ ['cexp','Hyödynnän käyttäjätutkimusta, palautetta ja käyttötietoa tuotepäätöksissä enkä luota vain sisäisiin oletuksiin.'],
+ ['cexp','Pystyn arvioimaan, ratkaiseeko ehdotettu ominaisuus aidosti käyttäjän ongelmaa vai ainoastaan lisää toiminnallisuutta.'],
+
+ ['meas','Määrittelen tuotteelle outcome- ja vaikutusmittareita pelkkien toimitusmäärien sijaan.'],
+ ['meas','Seuraan tuotteen käyttöä ja tuloksia sekä muutan prioriteetteja datan perusteella.'],
+ ['meas','Pystyn erottamaan toisistaan outputin, outcomen ja liiketoimintahyödyn.'],
+
+ ['feas','Pystyn vertailemaan vaihtoehtoja ja arvioimaan niiden liiketoiminnallisen, teknisen ja taloudellisen toteutettavuuden yhdessä asiantuntijoiden kanssa.'],
+ ['feas','Pystyn tekemään päätöksen myös epävarman tiedon perusteella ja tunnistamaan, mitä pitäisi validoida ensin.'],
+ ['feas','Pystyn tunnistamaan tilanteen, jossa pienempi kokeilu on perustellumpi kuin täysi toteutus.'],
+
+ ['demg','Pystyn asettamaan kehitystiimille selkeän tavoitteen ilman että määrään teknisen toteutustavan.'],
+ ['demg','Pystyn tekemään nopeita priorisointipäätöksiä toimituksen aikana uuden tiedon perusteella.'],
+ ['demg','Pystyn arvioimaan toimituksen jälkeen, syntyikö tavoiteltu arvo eikä vain sitä, valmistuiko sovittu ominaisuus.'],
+
+ ['benm','Pystyn yhdistämään roadmapin kehityskohteet konkreettisiin hyötyhypoteeseihin.'],
+ ['benm','Pystyn seuraamaan, realisoituivatko kehityksen tavoitellut hyödyt käytännössä.'],
+ ['benm','Pystyn lopettamaan tai muuttamaan kehityssuuntaa, jos odotettu hyöty ei toteudu.'],
+
+ ['fian','Ymmärrän riittävästi tuotteen kustannusrakennetta, jotta pystyn tekemään kustannus–hyöty-trade-offeja.'],
+ ['fian','Pystyn arvioimaan vaihtoehtoja elinkaarikustannusten enkä vain toteutuskustannuksen perusteella.'],
+ ['fian','Pystyn keskustelemaan tuotteen investoinnista, hyödyistä ja taloudellisista oletuksista päätöksentekijöiden kanssa.']
+];
+
+
+const projectManagerCompetencies = [
+ {id:'prmg', name:'Projektin kokonaisjohtaminen', sfia:'PRMG', target:5, weight:16, cls:'A', gate:3.5,
+  material:[
+   ['SFIA 9 – Project management','https://sfia-online.org/en/sfia-9/skills/project-management'],
+   ['PMI – Project Management Basics','https://www.pmi.org/learning/library']
+  ],
+  exercise:'Laadi yhdelle käynnissä olevalle hankkeelle yhden sivun projektin johtamismalli: tavoite, scope, päätöksenteko, keskeiset riippuvuudet, riskit, aikataulu ja onnistumisen mittarit.'},
+ {id:'rlmt', name:'Sidosryhmien johtaminen ja viestintä', sfia:'RLMT', target:4, weight:11, cls:'A',
+  material:[
+   ['SFIA 9 – Stakeholder relationship management','https://sfia-online.org/en/sfia-9/skills/stakeholder-relationship-management']
+  ],
+  exercise:'Tee hankkeelle sidosryhmäkartta ja määritä jokaiselle avainsidosryhmälle tavoite, vaikutus, viestintätapa ja päätöksenteon rooli.'},
+ {id:'burm', name:'Riski-, ongelma- ja riippuvuuksien hallinta', sfia:'BURM', target:4, weight:11, cls:'A', gate:3.0,
+  material:[
+   ['SFIA 9 – Risk management','https://sfia-online.org/en/sfia-9/skills/risk-management']
+  ],
+  exercise:'Rakenna projektille riskirekisteri, jossa vähintään 10 riskiä, todennäköisyys, vaikutus, omistaja, torjuntatoimi ja eskalointikynnys.'},
+ {id:'fmit', name:'Talouden, budjetin ja ennusteen hallinta', sfia:'FMIT', target:4, weight:10, cls:'A',
+  material:[
+   ['SFIA 9 – Financial management','https://sfia-online.org/en/sfia-9/skills/financial-management']
+  ],
+  exercise:'Tee projektille kuukausittainen kustannusennuste ja analysoi kolme skenaariota: perus, viivästys ja laajuuden kasvu.'},
+ {id:'resm', name:'Resurssien ja kapasiteetin hallinta', sfia:'RESC', target:4, weight:9, cls:'A',
+  material:[
+   ['SFIA 9 – Resourcing','https://sfia-online.org/en/sfia-9/skills/resourcing']
+  ],
+  exercise:'Tee projektin avainrooleille kapasiteettisuunnitelma ja tunnista pullonkaulat, varahenkilöt sekä ulkoisen kapasiteetin tarve.'},
+ {id:'prof', name:'Projektiohjaus, raportointi ja governance', sfia:'PROF', target:4, weight:9, cls:'B',
+  material:[
+   ['SFIA 9 – Portfolio, programme and project support','https://sfia-online.org/en/sfia-9/skills/portfolio-programme-and-project-support']
+  ],
+  exercise:'Muotoile yhden sivun projektiraportti, jossa status, päätettävät asiat, riskit, talous, aikataulu, riippuvuudet ja seuraavat virstanpylväät.'},
+ {id:'reqm', name:'Tavoitteiden, laajuuden ja vaatimusten hallinta', sfia:'REQM', target:4, weight:9, cls:'B',
+  material:[
+   ['SFIA 9 – Requirements definition and management','https://sfia-online.org/en/sfia-9/skills/requirements-definition-and-management']
+  ],
+  exercise:'Valitse projekti ja kuvaa scope rajauksineen. Tunnista viisi muutospyyntöä ja arvioi niiden vaikutus aikaan, kustannukseen, riskiin ja hyötyyn.'},
+ {id:'cipm', name:'Muutoksen käyttöönoton ja organisaatiomuutoksen koordinointi', sfia:'CIPM', target:4, weight:8, cls:'B',
+  material:[
+   ['SFIA 9 – Organisational change management','https://sfia-online.org/en/sfia-9/skills/organisational-change-management']
+  ],
+  exercise:'Laadi käyttöönottosuunnitelma: kohderyhmät, vaikutukset, koulutus, viestintä, readiness-kriteerit ja jälkiseuranta.'},
+ {id:'supp', name:'Toimittaja- ja kumppaniyhteistyö', sfia:'SUPP', target:4, weight:8, cls:'B',
+  material:[
+   ['SFIA 9 – Supplier management','https://sfia-online.org/en/sfia-9/skills/supplier-management']
+  ],
+  exercise:'Tee yhdelle toimittajalle yhteistyömalli: vastuut, tavoitteet, mittarit, eskalointipolku, muutosten käsittely ja riskit.'},
+ {id:'meas', name:'Edistymisen, laadun ja hyötyjen seuranta', sfia:'MEAS / BENM', target:4, weight:9, cls:'B',
+  material:[
+   ['SFIA 9 – Measurement','https://sfia-online.org/en/sfia-9/skills/measurement'],
+   ['SFIA 9 – Benefits management','https://sfia-online.org/en/sfia-9/skills/benefits-management']
+  ],
+  exercise:'Määritä projektille 5–7 mittaria, jotka kattavat etenemisen, laadun, ennustettavuuden ja tavoitellun liiketoimintahyödyn.'}
+];
+
+const projectManagerQuestions = [
+ ['prmg','Pystyn käynnistämään projektin niin, että tavoite, laajuus, vastuut, päätöksenteko ja onnistumisen kriteerit ovat selkeitä.'],
+ ['prmg','Pystyn johtamaan projektia kokonaisuutena ja tekemään tarvittavia korjausliikkeitä tilanteen muuttuessa.'],
+ ['prmg','Pystyn viemään projektin hallitusti päätökseen, varmistamaan hyväksynnän ja siirtämään vastuut jatkuvalle toiminnalle.'],
+
+ ['rlmt','Pystyn tunnistamaan projektin tärkeimmät sidosryhmät ja johtamaan heidän odotuksiaan aktiivisesti.'],
+ ['rlmt','Pystyn viestimään johdolle tiiviisti tilanteesta, riskeistä ja tarvittavista päätöksistä.'],
+ ['rlmt','Pystyn fasilitoimaan vaikean tilanteen, jossa eri sidosryhmillä on ristiriitaiset tavoitteet tai näkemykset.'],
+
+ ['burm','Pystyn tunnistamaan projektin olennaiset riskit, arvioimaan niiden vaikutukset ja sopimaan torjuntatoimet.'],
+ ['burm','Pystyn erottamaan toisistaan riskin, ongelman ja riippuvuuden sekä johtamaan niitä tarkoituksenmukaisesti.'],
+ ['burm','Pystyn eskaloimaan riskin tai ongelman oikea-aikaisesti ilman turhaa viivettä tai ylieskalointia.'],
+
+ ['fmit','Pystyn laatimaan realistisen projektibudjetin ja seuraamaan toteumaa suhteessa ennusteeseen.'],
+ ['fmit','Pystyn ennustamaan kustannusvaikutuksen, jos aikataulu, resurssit tai laajuus muuttuvat.'],
+ ['fmit','Pystyn keskustelemaan projektin taloudesta johdon kanssa ja tuomaan esiin olennaiset poikkeamat ja vaihtoehdot.'],
+
+ ['resm','Pystyn arvioimaan projektin tarvitsemat resurssit ja osaamiset eri vaiheissa.'],
+ ['resm','Pystyn tunnistamaan kapasiteettipullonkaulat ajoissa ja neuvottelemaan ratkaisuista linjan ja muiden projektien kanssa.'],
+ ['resm','Pystyn suunnittelemaan projektin niin, ettei yhden henkilön saatavuus muodostu tarpeettomaksi yksittäiseksi riippuvuudeksi.'],
+
+ ['prof','Pystyn rakentamaan projektin raportoinnin niin, että päätöksentekijä näkee nopeasti olennaisen tilanteen.'],
+ ['prof','Pystyn ylläpitämään päätös-, riski-, muutos- ja riippuvuuslokeja hallitusti ilman tarpeetonta byrokratiaa.'],
+ ['prof','Pystyn järjestämään projektin governance-rakenteen niin, että päätökset syntyvät oikealla tasolla ja riittävän nopeasti.'],
+
+ ['reqm','Pystyn pitämään projektin tavoitteen ja laajuuden hallinnassa, vaikka uusia tarpeita syntyy toteutuksen aikana.'],
+ ['reqm','Pystyn arvioimaan muutospyynnön vaikutuksen aikatauluun, kustannukseen, riskiin ja tavoiteltuun hyötyyn ennen päätöstä.'],
+ ['reqm','Pystyn varmistamaan, että projektin kriittiset vaatimukset ovat riittävän selkeitä ennen sitoutumista toteutukseen.'],
+
+ ['cipm','Pystyn suunnittelemaan käyttöönoton niin, että ihmiset, prosessit, koulutus ja viestintä ovat mukana teknisen toimituksen rinnalla.'],
+ ['cipm','Pystyn arvioimaan organisaation valmiutta muutokseen ja tunnistamaan käyttöönoton esteitä etukäteen.'],
+ ['cipm','Pystyn varmistamaan, että käyttöönoton jälkeen on sovittu omistajuus, tuki ja seuranta.'],
+
+ ['supp','Pystyn johtamaan toimittajan tekemistä tavoitteiden, sopimuksen ja projektin tarpeiden mukaisesti.'],
+ ['supp','Pystyn puuttumaan toimittajan suorituskykyongelmiin rakentavasti ja riittävän nopeasti.'],
+ ['supp','Pystyn sovittamaan usean toimittajan tekemisen yhteen niin, etteivät vastuurajat jää epäselviksi.'],
+
+ ['meas','Pystyn valitsemaan projektin etenemistä ja laatua kuvaavat mittarit ilman että raportointi keskittyy vain tehtävien määrään.'],
+ ['meas','Pystyn tunnistamaan ajoissa, jos projekti näyttää olevan vihreä aikataulun suhteen mutta tavoiteltu hyöty tai laatu on vaarassa.'],
+ ['meas','Pystyn seuraamaan projektin jälkeen, toteutuivatko tavoitellut hyödyt ja mitä opittiin seuraavia hankkeita varten.']
+];
+
+
+const roleConfigs = {
+  'solution-architect': {
+    key:'sa',
+    label:'Solution Architect',
+    primarySkill:'ARCH',
+    competencies:solutionArchitectCompetencies,
+    questions:solutionArchitectQuestions,
+    description:'Solution Architect muuttaa liiketoiminnan tavoitteet ja vaatimukset toteuttamiskelpoiseksi kokonaisratkaisuksi. Hän vastaa siitä, että sovellukset, integraatiot, data, infrastruktuuri, tietoturva ja operoitavuus muodostavat hallitun kokonaisuuden.',
+    responsibilities:[
+      'muodostaa ja vertailee ratkaisuvaihtoehtoja',
+      'yhteensovittaa sovellukset, integraatiot, datan, infrastruktuurin ja tietoturvan',
+      'varmistaa ei-toiminnalliset vaatimukset ja elinkaaren hallittavuuden',
+      'dokumentoi keskeiset arkkitehtuuripäätökset',
+      'ohjaa toteutusta ja hallitsee arkkitehtuuripoikkeamia'
+    ],
+    boundary:'Rooli keskittyy ratkaisun rakenteeseen ja tekniseen kokonaisuuteen. Se ei omista tuotteen liiketoimintaprioriteettia; siitä vastaa Product Owner / liiketoimintaomistaja.',
+    levels:['Junior Solution Architect','Solution Architect','Senior Solution Architect','Expert Solution Architect'],
+    expertText:'Kehitystä kannattaa suunnata organisaatiotason arkkitehtuuriperiaatteisiin, muiden arkkitehtien mentorointiin ja kaikkein vaativimpien ratkaisujen ohjaamiseen.'
+  },
+  'project-manager': {
+    key:'pm',
+    label:'Project Manager',
+    primarySkill:'PRMG',
+    competencies:projectManagerCompetencies,
+    questions:projectManagerQuestions,
+    description:'Project Manager vastaa projektin tavoitteiden saavuttamisesta sovitun laajuuden, aikataulun, kustannusten, laadun ja riskitason puitteissa. Hän johtaa projektin kokonaisuutta, koordinoi ihmisiä ja riippuvuuksia, varmistaa päätöksenteon sekä tekee tilanteen läpinäkyväksi sidosryhmille.',
+    responsibilities:[
+      'selkeyttää projektin tavoitteen, laajuuden, onnistumisen kriteerit ja päätöksentekomallin',
+      'johtaa aikataulua, kustannuksia, resursseja, riskejä ja riippuvuuksia',
+      'varmistaa riittävän projektiohjauksen, raportoinnin ja eskaloinnit',
+      'johtaa sidosryhmä- ja toimittajayhteistyötä',
+      'koordinoi käyttöönottoa ja muutoksen toteutumista yhdessä liiketoiminnan kanssa',
+      'varmistaa hallitun päätöksen, vastuiden siirron ja projektista oppimisen'
+    ],
+    boundary:'Project Manager ei lähtökohtaisesti omista tuotteen liiketoimintaprioriteettia eikä määritä ratkaisun teknistä arkkitehtuuria. Product Owner omistaa tuotteen arvon ja prioriteetit, Solution Architect ratkaisun teknisen kokonaisuuden ja Business Analyst analyysin sekä vaatimusten tarkennuksen. Project Manager vastaa siitä, että sovittu muutoskokonaisuus viedään hallitusti maaliin.',
+    levels:['Junior Project Manager','Project Manager','Senior Project Manager','Expert Project Manager'],
+    expertText:'Kehitystä kannattaa suunnata kaikkein vaativimpien strategisten hankkeiden johtamiseen, useiden projektien riippuvuuksien hallintaan, muiden projektipäälliköiden mentorointiin sekä projektijohtamisen toimintamallien kehittämiseen.'
+  },
+
+  'product-owner': {
+    key:'po',
+    label:'Product Owner',
+    primarySkill:'PROD',
+    competencies:productOwnerCompetencies,
+    questions:productOwnerQuestions,
+    description:'Product Owner vastaa tuotteen arvon maksimoinnista ja siitä, mihin kehitystiimin rajallinen kapasiteetti käytetään. Hän omistaa tuotevision, priorisoinnin, roadmapin ja backlogin sekä seuraa, syntyykö kehityksestä tavoiteltua asiakas-, käyttäjä- ja liiketoiminta-arvoa.',
+    responsibilities:[
+      'määrittelee tuotevision ja tavoitellut liiketoiminta- ja käyttäjätulokset',
+      'omistaa priorisoinnin, roadmapin ja tuotebacklogin',
+      'tekee päätökset siitä, mitä tehdään nyt, myöhemmin tai ei lainkaan',
+      'johtaa sidosryhmäodotuksia ja tuotteen päätöksentekoa',
+      'seuraa tuotteen käyttöä, vaikuttavuutta, hyötyjä ja elinkaarikustannuksia',
+      'toimii tiiviissä yhteistyössä Business Analystin, arkkitehtien, UX:n ja kehitystiimin kanssa'
+    ],
+    boundary:'Product Owner ei ole sama rooli kuin Business Analyst. Product Owner omistaa tuotteen arvon, suunnan ja prioriteetit sekä tekee trade-off-päätökset. Business Analyst puolestaan analysoi liiketoimintatilannetta, prosesseja, tietotarpeita ja vaatimuksia sekä auttaa tarkentamaan vaihtoehtoja. BA voi tukea Product Owneria, mutta ei lähtökohtaisesti omista tuotebacklogin liiketoimintaprioriteettia.',
+    levels:['Junior Product Owner','Product Owner','Senior Product Owner','Expert Product Owner'],
+    expertText:'Kehitystä kannattaa suunnata useiden tuotteiden väliseen arvon optimointiin, muiden Product Ownerien mentorointiin, tuotemallin kehittämiseen ja strategisen tuotejohtamisen vahvistamiseen.'
+  }
+};
+
+const activeRole = localStorage.getItem('bt_active_role') || 'solution-architect';
+const roleConfig = roleConfigs[activeRole] || roleConfigs['solution-architect'];
+const competencies = roleConfig.competencies;
+const questions = roleConfig.questions;
+
+const answers = JSON.parse(localStorage.getItem('bt_' + roleConfig.key + '_answers') || '{}');
+const managerAnswers = JSON.parse(localStorage.getItem('bt_' + roleConfig.key + '_manager_answers') || '{}');
+let latest = null;
+const selectedDevelopment = JSON.parse(localStorage.getItem('bt_' + roleConfig.key + '_selected_development') || '[]');
+
+
+function updateRoleContent(){
+  document.getElementById('roleTitle').textContent = roleConfig.label;
+  document.getElementById('roleDescription').textContent = roleConfig.description;
+  document.getElementById('roleResponsibilities').innerHTML =
+    roleConfig.responsibilities.map(x=>`<li>${x}</li>`).join('');
+  document.getElementById('roleBoundaryBox').innerHTML =
+    `<b>Roolirajaus:</b> ${roleConfig.boundary}`;
+  profile();
+}
+
+function initRoleSelector(){
+  const sel=document.getElementById('role');
+  sel.value=activeRole;
+  sel.addEventListener('change',()=>{
+    localStorage.setItem('bt_active_role',sel.value);
+    location.reload();
+  });
+}
+
+function setSteps(n){
+  ['s1','s2','s3','s4','s5','s6'].forEach((id,i)=>document.getElementById(id).classList.toggle('active',i<n));
+}
+function stepKey(e, view){
+  if(e.key==='Enter' || e.key===' '){
+    e.preventDefault();
+    navigateStep(view);
+  }
+}
+
+function navigateStep(view){
+  // Ohjeisiin ja alkuvaiheisiin pääsee aina.
+  if(view==='role' || view==='desc' || view==='survey' || view==='instructions'){
+    go(view);
+    return;
+  }
+
+  // Tulokset voidaan avata, jos ne on jo laskettu.
+  if(view==='results'){
+    if(latest){
+      go('results');
+      return;
+    }
+    // Jos kaikki vastaukset ovat jo olemassa, lasketaan tulos automaattisesti.
+    if(Object.keys(answers).length===30 && Object.keys(managerAnswers).length===30){
+      calculate();
+      return;
+    }
+    alert('Täytä ensin kaikki 30 kartoituskysymystä. Siirrytään kartoitukseen.');
+    go('survey');
+    return;
+  }
+
+  // Kehityspolku edellyttää laskettua tulosta.
+  if(view==='development'){
+    if(latest){
+      go('development');
+      return;
+    }
+    if(Object.keys(answers).length===30 && Object.keys(managerAnswers).length===30){
+      calculate();
+      // calculate() vie tuloksiin; avataan sen jälkeen kehityspolku.
+      setTimeout(()=>go('development'), 0);
+      return;
+    }
+    alert('Täytä ensin kaikki 30 kartoituskysymystä ja laske valmius. Siirrytään kartoitukseen.');
+    go('survey');
+  }
+}
+
+function go(view){
+  if(view==='desc') updateRoleContent();
+  ['role','desc','survey','results','development','instructions'].forEach(v=>document.getElementById('view-'+v).classList.add('hidden'));
+  document.getElementById('view-'+view).classList.remove('hidden');
+  const map={role:1,desc:2,survey:3,results:4,development:5,instructions:6}; setSteps(map[view]);
+  if(view==='development' && latest) renderDevelopment();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function profile(){
+  let h='<tr><th>Osaamisalue</th><th>SFIA</th><th>Tavoite</th><th>Paino</th><th>Luokka</th></tr>';
+  competencies.forEach(c=>{
+    h+=`<tr><td>${c.name}</td><td><b>${c.sfia}</b></td><td>${c.target}/5</td><td>${c.weight}%</td><td><span class="tag tag${c.cls}">${c.cls}</span></td></tr>`;
+  });
+  document.getElementById('profileTable').innerHTML=h;
+}
+function renderQuestions(){
+  const el=document.getElementById('questions'); el.innerHTML='';
+  questions.forEach((q,i)=>{
+    const c=competencies.find(x=>x.id===q[0]);
+    let html=`<div class="question" id="question${i}">
+      <div class="qhead">
+        <div><span class="tag tag${c.cls}">${c.sfia}</span> <b>${c.name}</b><div style="margin-top:7px">${q[1]}</div></div>
+        <div class="qnum">${i+1}/30</div>
+      </div>
+
+      <div class="assessment-block" id="selfBlock${i}">
+        <div class="assessment-title">Henkilön oma arvio</div>
+        <div class="scale">`;
+    for(let v=1;v<=5;v++){
+      html+=`<label><input type="radio" name="q${i}" value="${v}" ${answers[i]==v?'checked':''} onchange="saveAnswer(${i},${v})">${v}<div class="small">${['Tarvitsen ohjausta','Teen tuettuna','Itsenäinen','Vaativa taso','Ohjaan muita'][v-1]}</div></label>`;
+    }
+    html+=`</div></div>
+
+      <div class="assessment-block" id="managerBlock${i}">
+        <div class="assessment-title">Esimiehen arvio</div>
+        <div class="scale manager">`;
+    for(let v=1;v<=5;v++){
+      html+=`<label><input type="radio" name="mq${i}" value="${v}" ${managerAnswers[i]==v?'checked':''} onchange="saveManagerAnswer(${i},${v})">${v}<div class="small">${['Tarvitsee paljon ohjausta','Toimii tuettuna','Toimii itsenäisesti','Toimii vaativalla tasolla','Ohjaa muita / toimii esimerkkinä'][v-1]}</div></label>`;
+    }
+    html+='</div></div></div>'; 
+    el.insertAdjacentHTML('beforeend',html);
+  });
+  updateProgress();
+}
+function saveAnswer(i,v){ answers[i]=v; localStorage.setItem('bt_' + roleConfig.key + '_answers',JSON.stringify(answers)); clearMissingHighlight(i,'self'); updateProgress(); }
+function saveManagerAnswer(i,v){ managerAnswers[i]=v; localStorage.setItem('bt_' + roleConfig.key + '_manager_answers',JSON.stringify(managerAnswers)); clearMissingHighlight(i,'manager'); updateProgress(); }
+function updateProgress(){
+  const selfCount=Object.keys(answers).length;
+  const managerCount=Object.keys(managerAnswers).length;
+  document.getElementById('answeredText').textContent=`Oma ${selfCount}/30 · Esimies ${managerCount}/30`;
+  document.getElementById('progressBar').style.width=((selfCount+managerCount)/60*100)+'%';
+}
+
+function clearMissingHighlight(i, type){
+  const blockId = type==='self' ? `selfBlock${i}` : `managerBlock${i}`;
+  const block=document.getElementById(blockId);
+  if(block) block.classList.remove('missing');
+
+  const q=document.getElementById(`question${i}`);
+  if(q){
+    const selfMissing = answers[i]===undefined;
+    const mgrMissing = managerAnswers[i]===undefined;
+    if(!selfMissing && !mgrMissing) q.classList.remove('missing-question');
+  }
+}
+
+function highlightMissingAssessments(){
+  let firstMissing=null;
+
+  questions.forEach((q,i)=>{
+    const qEl=document.getElementById(`question${i}`);
+    const selfBlock=document.getElementById(`selfBlock${i}`);
+    const managerBlock=document.getElementById(`managerBlock${i}`);
+
+    const selfMissing = answers[i]===undefined;
+    const managerMissing = managerAnswers[i]===undefined;
+
+    if(selfBlock) selfBlock.classList.toggle('missing', selfMissing);
+    if(managerBlock) managerBlock.classList.toggle('missing', managerMissing);
+    if(qEl) qEl.classList.toggle('missing-question', selfMissing || managerMissing);
+
+    if(firstMissing===null && (selfMissing || managerMissing)){
+      firstMissing=qEl || selfBlock || managerBlock;
+    }
+  });
+
+  if(firstMissing){
+    firstMissing.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+
+function calculate(){
+  if(Object.keys(answers).length<30 || Object.keys(managerAnswers).length<30){
+    highlightMissingAssessments();
+    alert('Osa arvioinneista puuttuu. Puuttuvat kohdat on korostettu vaaleanpunaisella.');
+    return;
+  }
+  const scores={}, managerScores={}, combinedScores={};
+  competencies.forEach(c=>{
+    const idx=questions.map((q,i)=>q[0]===c.id?i:null).filter(x=>x!==null);
+    scores[c.id]=idx.reduce((s,i)=>s+Number(answers[i]),0)/idx.length;
+    managerScores[c.id]=idx.reduce((s,i)=>s+Number(managerAnswers[i]),0)/idx.length;
+    combinedScores[c.id]=(scores[c.id]+managerScores[c.id])/2;
+  });
+
+  let weighted=0;
+  competencies.forEach(c=>{ weighted += Math.min(1,combinedScores[c.id]/c.target)*c.weight; });
+
+  const gates=competencies.filter(c=>c.gate && combinedScores[c.id]<c.gate);
+  latest={scores,managerScores,combinedScores,total:weighted,gates};
+  renderResults(); go('results');
+}
+function labelFor(p){
+  if(p>=90)return ['Erittäin hyvä valmius','#15803d'];
+  if(p>=80)return ['Hyvä valmius','#15803d'];
+  if(p>=65)return ['Kohtalainen valmius','#b45309'];
+  if(p>=50)return ['Kehittyvä valmius','#b45309'];
+  return ['Perusosaamista kehitettävä','#b91c1c'];
+}
+function readinessFor(scoreSet){
+  let total=0;
+  competencies.forEach(c=>{
+    total += Math.min(1,scoreSet[c.id]/c.target)*c.weight;
+  });
+  const gates=competencies.filter(c=>c.gate && scoreSet[c.id]<c.gate);
+  return {total,gates};
+}
+
+function architectLevelAssessment(scoreSet, readiness){
+  const allMeetTarget = competencies.every(c => scoreSet[c.id] >= c.target);
+  const gatesPass = readiness.gates.length === 0;
+  const exceedable = competencies.filter(c => c.target < 5);
+  const stronglyAbove = exceedable.filter(c => scoreSet[c.id] >= c.target + 0.5).length;
+  const ceilingTargetsMastered = competencies
+    .filter(c => c.target >= 5)
+    .every(c => scoreSet[c.id] >= 4.8);
+  const weightedRaw = competencies.reduce((sum,c)=>sum + scoreSet[c.id]*c.weight, 0) / 100;
+
+  const expert = allMeetTarget && ceilingTargetsMastered && stronglyAbove >= 6 && weightedRaw >= 4.6;
+  const senior = allMeetTarget;
+  const roleReady = gatesPass && readiness.total >= 80;
+
+  let level, text;
+  if(expert){
+    level = roleConfig.levels[3];
+    text = 'Kaikki osaamisalueet ovat tavoitetasolla ja osaaminen ylittää tavoitetason merkittävästi useilla osaamisalueilla.';
+  }else if(senior){
+    level = roleConfig.levels[2];
+    text = 'Kaikki osaamisalueet ovat vähintään roolin tavoitetasolla.';
+  }else if(roleReady){
+    level = roleConfig.levels[1];
+    text = `Kriittiset osaamisvaatimukset täyttyvät ja kokonaisvalmius riittää itsenäiseen ${roleConfig.label} -rooliin.`;
+  }else{
+    level = roleConfig.levels[0];
+    text = `Osaamisprofiili ei vielä täytä itsenäisen ${roleConfig.label} -roolin kaikkia kriteerejä.`;
+  }
+
+  return {level,text,allMeetTarget,gatesPass,stronglyAbove,ceilingTargetsMastered,weightedRaw,roleReady,senior,expert};
+}
+
+
+function nextLevelGuidance(scoreSet, readiness, levelInfo){
+  const gapsToTarget = competencies
+    .map(c=>({c, score:scoreSet[c.id], gap:Math.max(0,c.target-scoreSet[c.id])}))
+    .filter(x=>x.gap>0.001)
+    .sort((a,b)=>(b.gap*b.c.weight)-(a.gap*a.c.weight));
+
+  if(levelInfo.level===roleConfig.levels[3]){
+    return {title:`Nykyinen taso on ${roleConfig.levels[3]}`,items:[
+      'Seuraavaa muodollista tasoa ei ole määritelty tässä mallissa.',
+      roleConfig.expertText
+    ]};
+  }
+
+  if(levelInfo.level===roleConfig.levels[2]){
+    const exceedable = competencies
+      .filter(c=>c.target<5)
+      .map(c=>({c,score:scoreSet[c.id],need:(c.target+0.5)-scoreSet[c.id]}))
+      .filter(x=>x.need>0)
+      .sort((a,b)=>b.need-a.need);
+    const items=[];
+    const primary=competencies.find(c=>c.sfia.split(' / ')[0]===roleConfig.primarySkill) || competencies[0];
+    if(primary && scoreSet[primary.id]<4.8){
+      items.push(`Nosta ${primary.name} käytännössä tasolle 5/5 (nyt ${scoreSet[primary.id].toFixed(1)}).`);
+    }
+    const alreadyStrong = competencies.filter(c=>c.target<5 && scoreSet[c.id]>=c.target+0.5).length;
+    if(alreadyStrong<6){
+      items.push(`Expert-taso edellyttää vähintään kuutta osaamisaluetta vähintään 0,5 pistettä yli tavoitteen. Nyt tällaisia alueita on ${alreadyStrong}/${competencies.filter(c=>c.target<5).length}.`);
+      exceedable.slice(0,4).forEach(x=>items.push(`${x.c.name}: nosta tasolta ${x.score.toFixed(1)} vähintään tasolle ${(x.c.target+0.5).toFixed(1)}.`));
+    }
+    const weightedRaw=competencies.reduce((sum,c)=>sum+scoreSet[c.id]*c.weight,0)/100;
+    if(weightedRaw<4.6) items.push(`Nosta painotettu kokonaisosaamistaso vähintään 4,6:een (nyt ${weightedRaw.toFixed(2)}).`);
+    return {title:`Seuraava taso: ${roleConfig.levels[3]}`,items};
+  }
+
+  if(levelInfo.level===roleConfig.levels[1]){
+    const items=gapsToTarget.length
+      ? gapsToTarget.map(x=>`${x.c.name}: ${x.score.toFixed(1)} → tavoite ${x.c.target.toFixed(1)}.`)
+      : ['Pidä kaikki osaamisalueet vähintään tavoitetasolla.'];
+    return {title:`Seuraava taso: ${roleConfig.levels[2]}`,items:[
+      `Senior-taso edellyttää, että kaikki ${competencies.length} osaamisaluetta ovat vähintään tavoitetasolla.`,
+      ...items
+    ]};
+  }
+
+  const items=[];
+  competencies.filter(c=>c.gate).forEach(c=>{
+    if(scoreSet[c.id]<c.gate) items.push(`${c.name}: nosta vähintään tasolle ${c.gate.toFixed(1)} (nyt ${scoreSet[c.id].toFixed(1)}).`);
+  });
+  if(readiness.total<80){
+    items.push(`Nosta painotettu valmius vähintään 80 %:iin (nyt ${Math.round(readiness.total)} %).`);
+    gapsToTarget.slice(0,4).forEach(x=>{
+      if(!items.some(t=>t.startsWith(x.c.name))) items.push(`${x.c.name}: ${x.score.toFixed(1)} → tavoite ${x.c.target.toFixed(1)}.`);
+    });
+  }
+  return {title:`Seuraava taso: ${roleConfig.levels[1]}`,items:items.length?items:['Kriittiset osaamiset ja 80 % valmius ovat jo lähellä täyttymistä.']};
+}
+
+function renderNextLevelGuidance(targetId, scoreSet, readiness, levelInfo){
+  const g=nextLevelGuidance(scoreSet,readiness,levelInfo);
+  const el=document.getElementById(targetId);
+  el.innerHTML=`<b>${g.title}</b><ul>${g.items.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+}
+
+function renderArchitectLevels(){
+  const selfReady = readinessFor(latest.scores);
+  const mgrReady = readinessFor(latest.managerScores);
+  const selfLevel = architectLevelAssessment(latest.scores, selfReady);
+  const mgrLevel = architectLevelAssessment(latest.managerScores, mgrReady);
+
+  const selfLab = labelFor(selfReady.total);
+  const mgrLab = labelFor(mgrReady.total);
+
+  document.getElementById('selfScore').textContent = Math.round(selfReady.total)+' %';
+  document.getElementById('selfScore').style.color = selfLab[1];
+  document.getElementById('selfStatus').textContent = selfLab[0];
+  document.getElementById('selfArchitectLevel').textContent = selfLevel.level;
+  document.getElementById('selfArchitectLevelText').textContent = selfLevel.text;
+
+  document.getElementById('managerScore').textContent = Math.round(mgrReady.total)+' %';
+  document.getElementById('managerScore').style.color = mgrLab[1];
+  document.getElementById('managerStatus').textContent = mgrLab[0];
+  document.getElementById('managerArchitectLevel').textContent = mgrLevel.level;
+  document.getElementById('managerArchitectLevelText').textContent = mgrLevel.text;
+
+  const crit = [
+    `${roleConfig.levels[1]}: kriittiset gate-osaamiset täyttyvät ja valmius on vähintään 80 %.`,
+    `${roleConfig.levels[2]}: jokainen osaamisalue on vähintään tavoitetasolla.`,
+    `${roleConfig.levels[3]}: Senior-tason lisäksi vähintään 6 osaamisaluetta on vähintään 0,5 yli tavoitteen, pääosaaminen käytännössä 5/5 ja painotettu osaamistaso vähintään 4,6.`
+  ];
+  document.getElementById('architectCriteria').innerHTML =
+    crit.map(x=>`<div class="criterion">• ${x}</div>`).join('');
+
+  const gb=document.getElementById('gateBox');
+  const warnings=[];
+  if(selfReady.gates.length) warnings.push('Oma arvio: '+selfReady.gates.map(c=>c.name).join(', '));
+  if(mgrReady.gates.length) warnings.push('Esimiehen arvio: '+mgrReady.gates.map(c=>c.name).join(', '));
+
+  if(warnings.length){
+    gb.classList.remove('hidden','ok');
+    gb.innerHTML='<b>Kriittisiä osaamisvajeita:</b><br>'+warnings.join('<br>');
+  }else{
+    gb.classList.remove('hidden');
+    gb.classList.add('ok');
+    gb.innerHTML='<b>Kynnysvaatimukset täyttyvät sekä henkilön omassa että esimiehen arviossa.</b>';
+  }
+
+  renderNextLevelGuidance('selfNextLevel', latest.scores, selfReady, selfLevel);
+  renderNextLevelGuidance('managerNextLevel', latest.managerScores, mgrReady, mgrLevel);
+
+  return {selfReady,mgrReady,selfLevel,mgrLevel};
+}
+
+function renderResults(){
+  document.getElementById('summaryText').textContent =
+    'Valmius ja arvioitu roolitaso näytetään erikseen henkilön oman arvion ja esimiehen arvion perusteella. Näin näkemyserot tulevat näkyviksi ilman, että niitä häivytetään yhdeksi keskiarvoksi.';
+
+  renderArchitectLevels();
+
+  const rows=document.getElementById('resultRows');
+  rows.innerHTML='';
+
+  competencies.forEach(c=>{
+    const self=latest.scores[c.id];
+    const mgr=latest.managerScores[c.id];
+    const comb=latest.combinedScores[c.id];
+    const pct=Math.min(100,comb/c.target*100);
+
+    rows.insertAdjacentHTML('beforeend',`<div class="row">
+      <div><b>${c.name}</b><div class="small">${c.sfia} · paino ${c.weight}%</div></div>
+      <div>Tavoite<br><b>${c.target.toFixed(1)}</b></div>
+      <div>Oma<br><b>${self.toFixed(1)}</b></div>
+      <div>Esimies<br><b>${mgr.toFixed(1)}</b></div>
+      <div>Yhteinen<br><b>${comb.toFixed(1)}</b></div>
+      <div class="bar"><div style="width:${pct}%"></div></div>
+    </div>`);
+  });
+
+  renderDiscussionTopics();
+  drawRadar();
+}
+
+function drawRadar(){
+  const canvas=document.getElementById('radar'), ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2+10,R=145,N=competencies.length;
+  ctx.clearRect(0,0,W,H);
+  ctx.font='12px Segoe UI'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  for(let l=1;l<=5;l++){
+    const r=R*l/5; ctx.beginPath();
+    for(let i=0;i<N;i++){
+      const a=-Math.PI/2+i*2*Math.PI/N,x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    }
+    ctx.closePath();ctx.strokeStyle='#d8dee8';ctx.stroke();
+  }
+  function poly(vals, stroke, fill){
+    ctx.beginPath();
+    vals.forEach((v,i)=>{
+      const a=-Math.PI/2+i*2*Math.PI/N,r=R*v/5,x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    });
+    ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=2.5;ctx.stroke();
+  }
+  poly(competencies.map(c=>c.target),'#3659e3','rgba(54,89,227,.08)');
+  poly(competencies.map(c=>latest.scores[c.id]),'#f97316','rgba(249,115,22,.05)');
+  poly(competencies.map(c=>latest.managerScores[c.id]),'#64748b','rgba(100,116,139,.05)');
+  competencies.forEach((c,i)=>{
+    const a=-Math.PI/2+i*2*Math.PI/N, x=cx+(R+42)*Math.cos(a), y=cy+(R+32)*Math.sin(a);
+    ctx.fillStyle='#334155'; ctx.fillText(c.sfia,x,y);
+  });
+  ctx.fillStyle='#3659e3';ctx.fillRect(18,16,18,3);ctx.fillStyle='#334155';ctx.textAlign='left';ctx.fillText('Tavoite',42,18);
+  ctx.fillStyle='#f97316';ctx.fillRect(105,16,18,3);ctx.fillStyle='#334155';ctx.fillText('Oma arvio',129,18);
+  ctx.fillStyle='#64748b';ctx.fillRect(210,16,18,3);ctx.fillStyle='#334155';ctx.fillText('Esimies',234,18);
+}
+
+function renderDiscussionTopics(){
+  const diffs = competencies.map(c=>({
+    c,
+    self: latest.scores[c.id],
+    mgr: latest.managerScores[c.id],
+    diff: Math.abs(latest.scores[c.id]-latest.managerScores[c.id])
+  })).sort((a,b)=>b.diff-a.diff).slice(0,3);
+
+  const gaps = competencies.map(c=>({
+    c,
+    combined: latest.combinedScores[c.id],
+    gap: Math.max(0,c.target-latest.combinedScores[c.id])
+  })).sort((a,b)=>b.gap-a.gap).slice(0,3);
+
+  const diffEl=document.getElementById('discussionDifferences');
+  diffEl.innerHTML = diffs.map(x=>`
+    <div class="discussion">
+      <h3>${x.c.name}</h3>
+      <div class="small">${x.c.sfia}</div>
+      <p>Oma arvio <b>${x.self.toFixed(1)}</b> · Esimiehen arvio <b>${x.mgr.toFixed(1)}</b> · ero <span class="delta-big">${x.diff.toFixed(1)}</span></p>
+      <div class="small">Keskustelkaa, mistä näkemysero johtuu ja mitä konkreettisia työnäyttöjä arvioiden taustalla on.</div>
+    </div>
+  `).join('');
+
+  const gapEl=document.getElementById('discussionGaps');
+  gapEl.innerHTML = gaps.map(x=>`
+    <div class="discussion">
+      <h3>${x.c.name}</h3>
+      <div class="small">${x.c.sfia}</div>
+      <p>Yhteinen arvio <b>${x.combined.toFixed(1)}</b> · tavoite <b>${x.c.target.toFixed(1)}</b> · gap <span class="delta-big">${x.gap.toFixed(1)}</span></p>
+      <div class="small">Keskustelkaa konkreettisesta kehitystoimenpiteestä, jolla ero tavoitetasoon pienenee.</div>
+    </div>
+  `).join('');
+}
+
+function devPriority(c){
+  const gap=Math.max(0,c.target-latest.combinedScores[c.id]);
+  const gateBoost=(c.gate && latest.combinedScores[c.id]<c.gate)?1.5:1;
+  return gap*c.weight*gateBoost;
+}
+function toggleDevelopment(id, checked){
+  const idx=selectedDevelopment.indexOf(id);
+  if(checked && idx===-1){
+    if(selectedDevelopment.length>=3){
+      alert('Voitte valita enintään kolme kehityskohdetta.');
+      const cb=document.querySelector(`input[data-dev-id="${id}"]`);
+      if(cb) cb.checked=false;
+      return;
+    }
+    selectedDevelopment.push(id);
+  }else if(!checked && idx!==-1){
+    selectedDevelopment.splice(idx,1);
+  }
+  localStorage.setItem('bt_' + roleConfig.key + '_selected_development',JSON.stringify(selectedDevelopment));
+  updateSelectedDevelopment();
+}
+
+function updateSelectedDevelopment(){
+  document.getElementById('selectedCount').textContent=selectedDevelopment.length;
+  const names=selectedDevelopment.map(id=>competencies.find(c=>c.id===id)?.name).filter(Boolean);
+  document.getElementById('selectedNames').textContent=names.length?names.join(' · '):'Ei valintoja.';
+}
+
+function renderDevelopment(){
+  const ranked=[...competencies].sort((a,b)=>devPriority(b)-devPriority(a)).slice(0,10);
+  const el=document.getElementById('devAreas'); el.innerHTML='';
+  ranked.forEach((c,idx)=>{
+    const s=latest.combinedScores[c.id],gap=Math.max(0,c.target-s);
+    let links=c.material.map(m=>`<li><a href="${m[1]}" target="_blank" rel="noopener">${m[0]}</a></li>`).join('');
+    const checked=selectedDevelopment.includes(c.id)?'checked':'';
+    el.insertAdjacentHTML('beforeend',`<div class="devcard">
+      <div class="dev-select">
+        <input type="checkbox" data-dev-id="${c.id}" ${checked} onchange="toggleDevelopment('${c.id}',this.checked)">
+        <div style="flex:1">
+          <div class="rank">Prioriteetti ${idx+1}</div>
+          <h3>${c.name} <span class="tag tag${c.cls}">${c.sfia}</span></h3>
+          <p><b>Yhteinen arvio:</b> ${s.toFixed(1)} / 5 &nbsp; <b>Tavoite:</b> ${c.target} / 5 &nbsp; <b>Gap:</b> ${gap.toFixed(1)}</p>
+          <h3>Opiskele</h3><ul>${links}</ul>
+          <h3>Harjoittele</h3><p>${c.exercise}</p>
+          <h3>Näyttö työssä</h3><p>Valitkaa todellinen työtehtävä, jossa tätä osaamista tarvitaan. Sopikaa etukäteen, millainen näyttö osoittaa tavoitetason saavuttamisen ja miten palaute annetaan.</p>
+        </div>
+      </div>
+    </div>`);
+  });
+  updateSelectedDevelopment();
+}
+
+function printReport(){
+  if(!latest){
+    alert('Laske ensin arvioinnin tulokset.');
+    return;
+  }
+
+  const selfReady=readinessFor(latest.scores);
+  const mgrReady=readinessFor(latest.managerScores);
+  const selfLevel=architectLevelAssessment(latest.scores,selfReady);
+  const mgrLevel=architectLevelAssessment(latest.managerScores,mgrReady);
+  const selfNext=nextLevelGuidance(latest.scores,selfReady,selfLevel);
+  const mgrNext=nextLevelGuidance(latest.managerScores,mgrReady,mgrLevel);
+
+  const selected=selectedDevelopment
+    .map(id=>competencies.find(c=>c.id===id))
+    .filter(Boolean);
+
+  const competencyRows=competencies.map(c=>{
+    const self=latest.scores[c.id];
+    const mgr=latest.managerScores[c.id];
+    const combined=latest.combinedScores[c.id];
+    const gap=Math.max(0,c.target-combined);
+    return `<tr>
+      <td><b>${c.name}</b><br><span class="muted">${c.sfia}</span></td>
+      <td>${c.target.toFixed(1)}</td>
+      <td>${self.toFixed(1)}</td>
+      <td>${mgr.toFixed(1)}</td>
+      <td>${combined.toFixed(1)}</td>
+      <td>${gap.toFixed(1)}</td>
+    </tr>`;
+  }).join('');
+
+  const diffTopics=competencies.map(c=>({
+      c,self:latest.scores[c.id],mgr:latest.managerScores[c.id],
+      diff:Math.abs(latest.scores[c.id]-latest.managerScores[c.id])
+    }))
+    .sort((a,b)=>b.diff-a.diff)
+    .slice(0,3);
+
+  const gapTopics=competencies.map(c=>({
+      c,combined:latest.combinedScores[c.id],
+      gap:Math.max(0,c.target-latest.combinedScores[c.id])
+    }))
+    .sort((a,b)=>b.gap-a.gap)
+    .slice(0,3);
+
+  const selectedHtml=selected.length
+    ? selected.map(c=>`<div class="print-card">
+        <b>${c.name}</b> <span class="muted">(${c.sfia})</span><br>
+        <span class="muted">Yhteinen arvio ${latest.combinedScores[c.id].toFixed(1)} / 5 · tavoite ${c.target.toFixed(1)} / 5</span>
+        <h3>Harjoitus</h3><div>${c.exercise}</div>
+      </div>`).join('')
+    : '<p>Ei vielä yhdessä valittuja kehityskohteita.</p>';
+
+  const report=document.getElementById('printReportSection');
+  report.innerHTML=`
+    <h1>${roleConfig.label} – osaamisarvioinnin yhteenveto</h1>
+    <div class="muted">Päiväys: ${new Date().toLocaleDateString('fi-FI')}</div>
+
+    <h2>1. Valmius tehtävään</h2>
+    <div class="print-card">
+      <b>Henkilön oma arvio:</b> ${Math.round(selfReady.total)} % · <b>${selfLevel.level}</b><br>
+      <span class="muted">${selfLevel.text}</span>
+    </div>
+    <div class="print-card">
+      <b>Esimiehen arvio:</b> ${Math.round(mgrReady.total)} % · <b>${mgrLevel.level}</b><br>
+      <span class="muted">${mgrLevel.text}</span>
+    </div>
+
+    <h2>2. Mitä pitää kehittää seuraavalle tasolle?</h2>
+    <div class="print-card">
+      <b>Henkilön oman arvion perusteella – ${selfNext.title}</b>
+      <ul>${selfNext.items.map(x=>`<li>${x}</li>`).join('')}</ul>
+    </div>
+    <div class="print-card">
+      <b>Esimiehen arvion perusteella – ${mgrNext.title}</b>
+      <ul>${mgrNext.items.map(x=>`<li>${x}</li>`).join('')}</ul>
+    </div>
+
+    <h2>3. Osaamisprofiili</h2>
+    <table>
+      <thead><tr><th>Osaamisalue</th><th>Tavoite</th><th>Oma</th><th>Esimies</th><th>Yhteinen</th><th>Gap</th></tr></thead>
+      <tbody>${competencyRows}</tbody>
+    </table>
+
+    <h2>4. Keskustelun aiheet</h2>
+    <div class="print-card">
+      <b>Suurimmat erot henkilön ja esimiehen arvioissa</b>
+      <ul>${diffTopics.map(x=>`<li>${x.c.name}: oma ${x.self.toFixed(1)}, esimies ${x.mgr.toFixed(1)}, ero ${x.diff.toFixed(1)}</li>`).join('')}</ul>
+    </div>
+    <div class="print-card">
+      <b>Suurimmat matkat tavoitetasoon</b>
+      <ul>${gapTopics.map(x=>`<li>${x.c.name}: yhteinen ${x.combined.toFixed(1)}, tavoite ${x.c.target.toFixed(1)}, gap ${x.gap.toFixed(1)}</li>`).join('')}</ul>
+    </div>
+
+    <h2>5. Yhdessä valitut kehityskohteet</h2>
+    ${selectedHtml}
+
+    <p class="muted" style="margin-top:20px">Tulostusnäkymä sisältää arvioinnin, tulokset, keskustelun aiheet sekä yhdessä valitut kehityskohteet.</p>
+  `;
+
+  // Same-page print avoids popup blocking.
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      window.print();
+    });
+  });
+}
+
+function exportJSON(){
+  const selfReady=latest?readinessFor(latest.scores):null;
+  const managerReady=latest?readinessFor(latest.managerScores):null;
+  const selfLevel=latest?architectLevelAssessment(latest.scores,selfReady):null;
+  const managerLevel=latest?architectLevelAssessment(latest.managerScores,managerReady):null;
+  const data={role:roleConfig.label,date:new Date().toISOString(),answers,managerAnswers,scores:latest?.scores,managerScores:latest?.managerScores,combinedScores:latest?.combinedScores,selfReadiness:selfReady?.total,managerReadiness:managerReady?.total,selfArchitectLevel:selfLevel?.level,managerArchitectLevel:managerLevel?.level,selectedDevelopment};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=roleConfig.key+'-osaamiskartoitus.json';a.click();URL.revokeObjectURL(a.href);
+}
+function resetAll(){
+  if(!confirm('Tyhjennetäänkö kaikki vastaukset?'))return;
+  localStorage.removeItem('bt_' + roleConfig.key + '_answers'); localStorage.removeItem('bt_' + roleConfig.key + '_manager_answers'); localStorage.removeItem('bt_' + roleConfig.key + '_selected_development'); Object.keys(answers).forEach(k=>delete answers[k]); Object.keys(managerAnswers).forEach(k=>delete managerAnswers[k]); selectedDevelopment.splice(0,selectedDevelopment.length); latest=null; renderQuestions(); go('role');
+}
+initRoleSelector();updateRoleContent();renderQuestions();
+</script>
+</body>
+</html>
